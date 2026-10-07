@@ -391,7 +391,7 @@ const ROOMS = {
 const PACK = [
   ['身分證、健保卡'],['現金','小吃、伴手禮、採果'],['手機、充電線'],['行動電源'],
   ['帽子、防曬乳'],['太陽眼鏡'],['薄外套','海邊風大、早晚涼'],['好走的運動鞋','兩天都會騎腳踏車'],
-  ['換洗衣物兩套'],['毛巾、拖鞋','團康會玩水'],['一套玩水後換的衣服','團康會玩水'],['盥洗用品'],['個人藥品、暈車藥'],['折疊傘'],['環保袋'],['水壺'],
+  ['換洗衣物兩套'],['毛巾、拖鞋','團康會玩水'],['一套玩水後換的衣服','團康會玩水'],['盥洗用品','牙膏、牙刷、洗面乳、洗髮精、沐浴乳'],['個人藥品、暈車藥'],['折疊傘'],['環保袋'],['水壺'],
 ];
 
 const LEVELS = [
@@ -577,6 +577,7 @@ P.push({id:'party', toc:'晚會', star:true, cls:'day2', html:()=>`
 dayPages(3);
 P.push({id:'pack', toc:'必帶用品', cls:'warm', html:()=>`
   ${band('必帶用品','點一下打勾')}
+  <div class="info" style="margin-bottom:14px">（2023/7月開始因應環保局規定，無主動提供一次性盥洗用具，有需要再麻煩主動告知）</div>
   <div class="intro"><div><div class="stat"><span class="packCount">0</span><span style="font-size:20px"> / ${PACK.length}</span></div><p class="muted">已經準備好</p><div class="bar"><i class="packBar"></i></div></div>${illus('14-packing.jpg','打開的行李箱和旅行小物')}</div>
   <div class="checks">${PACK.map(([a,b],i)=>`<button type="button" class="check" data-pack="${i}" aria-pressed="false"><span class="box"></span><span class="lbl">${a}${b?`<small>${b}</small>`:''}</span></button>`).join('')}</div>`});
 P.push({id:'notice', toc:'注意事項', cls:'warm', html:()=>`
