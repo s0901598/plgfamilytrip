@@ -577,7 +577,7 @@ P.push({id:'party', toc:'晚會', star:true, cls:'day2', html:()=>`
 dayPages(3);
 P.push({id:'pack', toc:'必帶用品', cls:'warm', html:()=>`
   ${band('必帶用品','點一下打勾')}
-  <div class="info" style="margin-bottom:14px">（2023/7月開始因應環保局規定，無主動提供一次性盥洗用具，有需要再麻煩主動告知）</div>
+  <div class="info" style="margin-bottom:14px">（2023/7月開始因應環保局規定，民宿無主動提供一次性盥洗用具唷~）</div>
   <div class="intro"><div><div class="stat"><span class="packCount">0</span><span style="font-size:20px"> / ${PACK.length}</span></div><p class="muted">已經準備好</p><div class="bar"><i class="packBar"></i></div></div>${illus('14-packing.jpg','打開的行李箱和旅行小物')}</div>
   <div class="checks">${PACK.map(([a,b],i)=>`<button type="button" class="check" data-pack="${i}" aria-pressed="false"><span class="box"></span><span class="lbl">${a}${b?`<small>${b}</small>`:''}</span></button>`).join('')}</div>`});
 P.push({id:'notice', toc:'注意事項', cls:'warm', html:()=>`
