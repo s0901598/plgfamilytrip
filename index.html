@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="2026噗嚨共家族旅遊・彰化三天兩夜 10/24（六）– 10/26（一）行程電子書">
+<meta property="og:title" content="2026噗嚨共家族旅遊">
+<meta property="og:description" content="彰化三天兩夜 10/24（六）– 10/26（一）行程電子書，左右滑動翻頁">
+<meta name="theme-color" content="#FBF6EC">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+<title>2026噗嚨共家族旅遊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 版面:直式單頁繪本,一次一頁,左右滑動翻頁;米白紙底,Day 1 紅、Day 2 藍、Day 3 綠 */
+:root{
+  --paper:#FBF6EC; --paper2:#F3E9D6; --desk:#E9DDC7; --card:#FFFFFF;
+  --ink:#4A3B2F; --muted:#86766A; --line:#E6D8C1; --tbd:#A39482;
+  --d1:#D9503F; --d1s:#FBE3DE;
+  --d2:#3A7FBF; --d2s:#DCEAF6;
+  --d3:#4F9445; --d3s:#E0EFD8;
+  --w:#C9752A;  --ws:#F7E6D0;
+  --gold:#F2B544; --gold-ink:#5A3D00;
+  --lab1:#E0457B; --lab2:#2F86D2; --lab3:#4A9636; --lab4:#EC7424;
+  --f-display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --c:var(--w); --cs:var(--ws);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+html,body{overflow:hidden;overscroll-behavior:none}
+body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:10px}
+
+.day1{--c:var(--d1);--cs:var(--d1s)}
+.day2{--c:var(--d2);--cs:var(--d2s)}
+.day3{--c:var(--d3);--cs:var(--d3s)}
+.warm{--c:var(--w);--cs:var(--ws)}
+
+.stage{height:100%;display:flex;align-items:center;justify-content:center}
+.book{position:relative;width:100%;max-width:430px;height:100%;background:var(--paper);overflow:hidden}
+@media (min-width:600px){
+  .book{height:min(94%,920px);border-radius:32px;box-shadow:0 24px 60px rgba(74,59,47,.22)}
+}
+.track{display:flex;height:100%;transition:transform .32s ease;will-change:transform}
+.page{flex:0 0 100%;min-width:0;height:100%;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain;padding:74px 20px 112px;position:relative;background:var(--paper)}
+.page.tint{background:var(--cs)}
+
+/* 標題色帶 */
+.band{display:flex;align-items:center;gap:10px;background:var(--c);color:#fff;border-radius:18px;padding:12px 16px;margin-bottom:14px}
+.band .t{font-family:var(--f-display);font-size:24px;line-height:1.3;text-wrap:balance;min-width:0}
+.lv .band .t{font-size:clamp(19px,5.6vw,24px);white-space:nowrap}
+.band .chip{margin-left:auto;background:rgba(255,255,255,.24);border-radius:999px;padding:2px 10px;font-size:15px;font-weight:700;white-space:nowrap}
+.star-badge{display:inline-flex;align-items:center;gap:4px;background:var(--gold);color:var(--gold-ink);font-weight:700;font-size:15px;border-radius:999px;padding:3px 12px;margin-bottom:10px}
+.frame{border:5px double var(--c);border-radius:24px;padding:16px 14px;background:var(--card)}
+.muted{color:var(--muted)}
+
+/* 插圖預留 */
+.illus{margin:0}
+.illus img{display:block;width:100%;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:20px}
+.illus figcaption{display:none}
+.illus.missing img{display:none}
+.illus.missing figcaption{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;aspect-ratio:3/2;max-width:100%;border:2.5px dashed var(--c);background:var(--cs);border-radius:20px;text-align:center;padding:12px;color:var(--c)}
+.page.tint .illus.missing figcaption{background:var(--card)}
+.ph-tag{font-weight:700;font-size:13px;background:var(--card);border:1.5px solid var(--c);border-radius:999px;padding:1px 10px}
+.ph-desc{font-size:15px;color:var(--ink);line-height:1.4}
+.ph-file{font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+.illus.below{margin-top:18px}
+.illus.above{margin-bottom:16px}
+.illus.hero{width:100%;margin:6px 0 22px}
+.illus.full{position:absolute;inset:0}
+.illus.full img{height:100%;aspect-ratio:auto;border-radius:0}
+.illus.full.missing figcaption{aspect-ratio:auto;height:100%;border:0;border-radius:0;background:transparent;justify-content:flex-end;padding:0 24px 150px}
+
+/* 圖文並排 */
+.intro{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.intro > div{flex:1;min-width:0}
+.intro .illus{flex:0 0 52%}
+.intro .ph-desc{font-size:13px}
+.stat{font-family:var(--f-display);font-size:36px;color:var(--c);line-height:1.1}
+.intro p{font-size:16px;line-height:1.5;margin-top:4px}
+
+/* 時間軸 */
+.tl{list-style:none;position:relative}
+.tl::before{content:"";position:absolute;left:67px;top:14px;bottom:14px;border-left:3px dotted var(--c);opacity:.45}
+.tl > li{display:grid;grid-template-columns:54px 26px minmax(0,1fr);align-items:start;padding:7px 0}
+.tl-time{font-weight:700;color:var(--c);font-size:18px;text-align:right;font-variant-numeric:tabular-nums}
+.tl-dot{width:15px;height:15px;border-radius:50%;background:var(--paper);border:3px solid var(--c);margin:6px auto 0;position:relative;z-index:1}
+.tl li.star .tl-dot{background:var(--gold);border-color:var(--gold)}
+.tl-title{font-weight:700;font-size:19px;line-height:1.45}
+.tl-note{color:var(--muted);font-size:15px;line-height:1.45;margin-top:2px}
+.go{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:15px;font-weight:700;color:var(--c);background:var(--cs);border:0;border-radius:999px;padding:4px 12px;cursor:pointer}
+.go .s{color:var(--gold-ink);background:var(--gold);border-radius:50%;width:18px;height:18px;display:inline-grid;place-items:center;font-size:11px}
+
+/* 分組卡片 */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:350px){.grid{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px}
+.card h3{font-family:var(--f-display);font-weight:400;font-size:19px;color:var(--c);display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px}
+.seat{font-family:var(--f-body);font-size:13px;font-weight:700;background:var(--cs);color:var(--c);border-radius:999px;padding:1px 8px;white-space:nowrap}
+/* 名單:一列一位,寬度一致 */
+.names{display:flex;flex-direction:column;gap:5px}
+.name{display:block;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:3px 10px;font-size:17px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 房間 */
+.sec{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:20px;margin:4px 0 8px}
+.sec::after{content:"";flex:1;border-top:2px dashed var(--line)}
+.rooms{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.room{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:center;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:9px 12px}
+.room .no{font-family:var(--f-display);font-size:27px;color:var(--c);text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.room .type{display:block;font-family:var(--f-body);font-size:13px;color:var(--muted);margin-top:4px}
+.room .who{font-size:18px;font-weight:500;line-height:1.45}
+.room.staff{background:var(--paper2)}
+.room.staff .no{color:var(--muted)}
+
+/* 分隔頁 */
+.divwrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.big{font-family:var(--f-display);font-size:68px;color:var(--c);line-height:1;letter-spacing:3px}
+.date{font-size:22px;font-weight:700;margin-top:8px}
+.theme{margin-top:14px;background:var(--card);border-radius:999px;padding:8px 20px;font-size:18px;text-wrap:balance}
+/* 行程頁上方:插圖 + DAY + 日期 + 主題 */
+.dayhead{background:var(--cs);border-radius:24px;padding:14px 14px 18px;text-align:center;margin-bottom:16px}
+.dayhead .illus{margin-bottom:12px}
+.dayhead .illus.missing figcaption{background:var(--card)}
+.dayhead .big{font-size:52px}
+.dayhead .date{margin-top:6px}
+.dayhead .theme{margin-top:10px;display:inline-block}
+
+/* 封面、封底 */
+.cover{padding:0;background:linear-gradient(180deg,#FDF4E3 0%,#FBE6CF 100%)}
+.cover-text{position:absolute;top:0;left:0;right:0;padding:72px 24px 0;text-align:center;z-index:2}
+.pill{display:inline-block;background:var(--d1);color:#fff;border-radius:999px;padding:4px 14px;font-size:15px;font-weight:700}
+.cover h1{font-family:var(--f-display);font-weight:400;font-size:42px;line-height:1.2;margin-top:16px;text-wrap:balance}
+.cover h1 .yr{display:block;font-size:60px;color:var(--d1);letter-spacing:2px}
+.cover .date{margin-top:10px}
+.cover .welcome{margin-top:12px;font-size:18px}
+.hint{position:absolute;left:0;right:0;bottom:96px;text-align:center;z-index:2;font-weight:700;color:var(--d1)}
+.hint span{display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-8px)}}
+.back-wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 20px 120px;text-align:center}
+.cover-wrap{gap:14px}
+.cover-wrap h1{margin-top:0}
+.cover-wrap .date{margin-top:0}
+.cover-wrap .hint{position:static}
+.back-wrap .logo{display:block;width:100%;max-width:360px;height:auto}
+.back h1{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1.45;text-wrap:balance}
+.contact{margin-top:14px;display:inline-block;border:2px dashed var(--tbd);border-radius:14px;padding:6px 14px;font-size:16px;color:var(--tbd);background:rgba(255,255,255,.6)}
+.contact b{color:var(--ink)}
+
+/* 目錄 */
+/* 快捷按鈕列:可左右捲動,第 4 個只露一半,提示後面還有 */
+.quick{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;margin:0 -20px 18px;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:0 0 calc((100% - 4px) / 3.5);scroll-snap-align:start;scroll-margin-left:20px;background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:14px 4px;font-weight:700;font-size:16px;line-height:1.35;white-space:nowrap;cursor:pointer}
+.toc-g{margin-bottom:12px}
+.toc-g h3{font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--c);margin-bottom:2px}
+.toc-item{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;border-bottom:1.5px dashed var(--line);padding:9px 2px;font-size:18px;text-align:left;cursor:pointer}
+.toc-item .pg{margin-left:auto;color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.toc-item.sub{padding-left:30px;font-size:16px;color:var(--muted)}
+.toc-item .s{color:var(--gold-ink);background:var(--gold);border-radius:50%;width:20px;height:20px;display:inline-grid;place-items:center;font-size:12px;flex:0 0 20px}
+
+/* 總覽 */
+.daycards{display:flex;flex-direction:column;gap:10px}
+.daycard{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--cs);border-radius:18px;padding:12px 14px;cursor:pointer}
+.daycard .h{display:flex;align-items:baseline;gap:8px;font-family:var(--f-display);font-size:21px;color:var(--c)}
+.daycard .h small{font-family:var(--f-body);font-size:16px;font-weight:700;color:#1F1A16}
+.daycard .h .arr{margin-left:auto;font-size:18px}
+.daycard ul{list-style:none;display:flex;flex-wrap:wrap;gap:2px 0;margin-top:6px}
+.daycard li{font-size:16px;font-weight:500}
+.daycard li:not(:last-child)::after{content:"›";color:var(--c);margin:0 7px;font-weight:700}
+
+/* 待補 */
+.bigtime{font-family:var(--f-display);font-size:52px;color:var(--c);text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.bigtime small{display:block;font-family:var(--f-body);font-size:16px;color:var(--muted);margin-top:6px}
+.tbd{border:2px dashed var(--tbd);border-radius:14px;padding:10px 14px;color:var(--tbd);background:var(--paper);font-size:16px}
+.tbd b{display:block;color:var(--ink);font-size:17px}
+.tbds{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+
+/* 必帶用品 */
+.bar{height:10px;border-radius:999px;background:var(--paper2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:var(--c);border-radius:999px;transition:width .25s}
+.checks{display:flex;flex-direction:column;gap:7px}
+.check{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;font-size:18px;text-align:left;cursor:pointer;line-height:1.4}
+.check .box{flex:0 0 26px;height:26px;border-radius:8px;border:2.5px solid var(--c);display:grid;place-items:center;color:#fff;font-weight:700;font-size:16px}
+.check.on .box{background:var(--c)}
+.check.on .box::after{content:"✓"}
+.check.on .lbl{color:var(--muted);text-decoration:line-through}
+.check .lbl small{display:block;font-size:14px;color:var(--muted);text-decoration:none}
+
+/* 注意事項 */
+.notes{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:8px}
+.notes li{display:flex;gap:12px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:11px 14px;font-size:17px;line-height:1.5}
+.notes li::before{counter-increment:n;content:counter(n);flex:0 0 28px;height:28px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.notes li.tbdli{border:2px dashed var(--tbd);color:var(--tbd);background:var(--paper)}
+.notes li.tbdli b{color:var(--ink)}
+
+/* 關卡 */
+.levels{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.lv-btn{display:flex;align-items:center;gap:10px;width:100%;background:var(--cs);border:0;border-radius:14px;padding:10px 14px;font-size:18px;font-weight:700;text-align:left;cursor:pointer}
+.lv-btn .n{flex:0 0 auto;background:var(--c);color:#fff;border-radius:999px;padding:1px 10px;font-size:14px}
+.lv-btn .arr{margin-left:auto;color:var(--c)}
+.info{border:2px solid var(--cs);border-radius:14px;padding:10px 14px;background:var(--card);font-size:16px}
+.info b{display:block;font-size:17px}
+.shot{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;position:relative;margin-bottom:6px}
+.shot img{display:block;width:100%;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:16px;border:1.5px solid var(--line)}
+.shot.tall{margin-bottom:14px}
+.shot.tall img{aspect-ratio:2/3}
+.shot .zoom{position:absolute;right:8px;bottom:8px;background:rgba(74,59,47,.78);color:#fff;font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px}
+.rules{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.rule{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.rule .lab{color:#fff;font-weight:700;font-size:15px;border-radius:999px;padding:2px 10px;white-space:nowrap;margin-top:2px}
+.rule:nth-child(1) .lab{background:var(--lab1)}
+.rule:nth-child(2) .lab{background:var(--lab2)}
+.rule:nth-child(3) .lab{background:var(--lab3)}
+.rule:nth-child(4) .lab{background:var(--lab4)}
+.rule:nth-child(5) .lab{background:var(--w)}
+/* 美食連連看 */
+.shot.free img{aspect-ratio:auto}
+.bingo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.bingo div{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:15px;font-weight:700;line-height:1.35;display:flex;flex-direction:column;justify-content:center}
+.bingo small{display:block;font-size:12px;font-weight:700;color:var(--c)}
+.bingo .free{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.bingo .free small{color:var(--gold-ink)}
+.rule p{font-size:18px;line-height:1.55}
+.rule p + p{margin-top:4px}
+.lb{position:absolute;inset:0;z-index:20;background:rgba(40,30,22,.92);display:flex;align-items:center;justify-content:center;padding:16px;touch-action:pinch-zoom}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:100%;border-radius:12px}
+.lb button{position:absolute;top:12px;right:14px;background:var(--card);border:0;border-radius:999px;padding:6px 16px;font-weight:700;font-size:16px;cursor:pointer}
+.lb p{position:absolute;bottom:24px;left:0;right:0;text-align:center;color:#fff;font-size:14px}
+
+/* 翻頁列 */
+.nav{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px 18px;z-index:5;pointer-events:none}
+.nav button{pointer-events:auto;width:56px;height:56px;border-radius:50%;border:0;background:var(--nav,var(--w));color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 0 rgba(74,59,47,.18)}
+.nav button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(74,59,47,.18)}
+.nav button.hide{visibility:hidden}
+.nav button[hidden]{display:none}
+.nav .home-btn{width:auto;padding:0 18px 0 14px;border-radius:999px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:17px}
+.nav .home-btn svg{width:22px;height:22px}
+.nav svg{width:26px;height:26px}
+#pageno{pointer-events:auto;background:var(--card);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px;box-shadow:0 2px 8px rgba(74,59,47,.14);font-variant-numeric:tabular-nums}
+/* 固定 top bar:內容捲動時從它下面經過,不會壓到按鈕 */
+.topbar{position:absolute;top:0;left:0;right:0;z-index:6;height:56px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--bar,var(--paper));border-bottom:1.5px solid var(--line)}
+.topbar[hidden]{display:none}
+.where{background:var(--nav,var(--w));color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.toc-btn{margin-left:auto;flex:0 0 auto;background:var(--card);border:2px solid var(--nav,var(--w));color:var(--nav,var(--w));border-radius:999px;padding:3px 14px;font-weight:700;font-size:16px;cursor:pointer}
+.toc-btn[hidden]{display:none}
+
+/* 晚會流程 */
+.flow{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-left:12px;border-left:3px solid var(--cs)}
+.flow li{display:block;padding:0;font-size:16px;line-height:1.45}
+.flow b{color:var(--c);margin-right:6px;font-variant-numeric:tabular-nums}
+.flow span{display:block;font-size:15px;color:var(--muted)}
+.shot.catering{margin-top:10px;cursor:zoom-in}
+.shot.catering .illus img,.shot.catering .illus.missing figcaption{border-radius:14px}
+.shot.catering .illus.missing + .zoom{display:none}
+.step{display:flex;align-items:center;gap:10px;margin:20px 0 10px}
+.step-n{flex:0 0 28px;height:28px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.step-h{font-size:19px;font-weight:700}
+.step-h b{color:var(--c);margin-right:8px;font-variant-numeric:tabular-nums}
+.menu{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.menu span{background:var(--cs);color:var(--ink);border-radius:999px;padding:3px 12px;font-size:16px;font-weight:500}
+.step + .lvcards{margin-top:0}
+
+/* 關卡(嵌在團康、晚會頁裡) */
+.lvcards{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.lvcard{display:grid;grid-template-columns:44% minmax(0,1fr);gap:12px;align-items:center;width:100%;background:var(--cs);border:0;border-radius:16px;padding:8px;text-align:left;cursor:pointer}
+.lvcard img{display:block;width:100%;max-width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:10px}
+.lvcard .n{display:inline-block;background:var(--c);color:#fff;border-radius:999px;padding:0 10px;font-size:14px;font-weight:700}
+.lvcard .nm{display:block;font-weight:700;font-size:18px;line-height:1.35;margin-top:4px}
+.lvcard .more{display:block;font-size:14px;font-weight:700;color:var(--c);margin-top:2px}
+.lv{position:absolute;inset:0;z-index:15;background:var(--paper);--bar:var(--paper)}
+.lv[hidden]{display:none}
+.lv-body{position:absolute;top:56px;left:0;right:0;bottom:0;overflow-y:auto;overscroll-behavior:contain;padding:16px 20px 32px}
+.back-btn{background:var(--card);border:2px solid var(--c);color:var(--c);border-radius:999px;padding:3px 14px;font-weight:700;font-size:16px;cursor:pointer}
+.book.lv-open .nav{display:none}
+
+@media (prefers-reduced-motion:reduce){
+  .track{transition:none}
+  .hint span{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="book" id="book">
+    <div class="track" id="track"></div>
+    <header class="topbar" id="topbar">
+      <span class="where" id="where"></span>
+      <button class="toc-btn" id="tocBtn" type="button">總覽</button>
+    </header>
+    <div class="lv day2" id="lv" hidden role="dialog" aria-label="詳細內容">
+      <header class="topbar"><button type="button" class="back-btn" id="lvBack">‹ 返回</button></header>
+      <div class="lv-body" id="lvBody"></div>
+    </div>
+    <div class="lb" id="lb" hidden role="dialog" aria-label="放大看關卡圖">
+      <button type="button" id="lbClose">關閉</button>
+      <img id="lbImg" alt="">
+      <p>可以用兩指放大，手機轉橫的看更清楚</p>
+    </div>
+    <nav class="nav" aria-label="翻頁">
+      <button id="prev" type="button" aria-label="上一頁"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span id="pageno" aria-live="polite">1 / 17</span>
+      <button id="next" type="button" aria-label="下一頁"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button id="home" type="button" class="home-btn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>回首頁</button>
+    </nav>
+  </div>
+</div>
+
+<script>
+/* ===== 資料(之後改內容只要改這裡) ===== */
+const DAYS = {
+  1:{date:'10/24（六）', theme:'拜媽祖、逛鹿港，下午去王功烤鮮蚵',
+     img:['03-day1.jpg','清晨遊覽車出發，遠方紅色廟宇'], trip:['04-day1-trip.png','廟宇、老街腳踏車、海牛、甕仔雞'],
+     items:[
+      ['06:30','接點1－五股','新北市五股區新城三路45號'],
+      ['07:00','接點2－新莊文藝中心','新北市新莊區中平路133號'],
+      ['08:45','接點3－後龍溫暖的家','苗栗縣後龍鎮水尾里2鄰9之5號'],
+      ['','鹿港天后宮拜拜、鹿港導覽','',['lukang','導覽分組']],
+      ['','午餐－鹿港美食','',['food','美食連連看']],
+      ['','王功漁港－海牛驛站',''],
+      ['','晚餐－58甕仔雞',''],
+      ['','前往民宿：金村花園民宿','',['room','房間分配']],
+     ]},
+  2:{date:'10/25（日）', theme:'看大佛、騎單車逛花海，晚上一起嗨',
+     img:['07-day2.jpg','藍天下山丘上的大佛'], trip:['08-day2-trip.png','大佛、日式料理、花卉、團康、晚會'],
+     items:[
+      ['','民宿出發',''],
+      ['','八卦山大佛風景區',''],
+      ['','淺田屋日本料理',''],
+      ['','田尾公路花園','',['tianwei','腳踏車分組']],
+      ['16:15','團康活動','',['games','團康活動']],
+      ['18:00','晚會開始（晚餐、晚會活動）','',['party','晚會'],'party'],
+     ]},
+  3:{date:'10/26（一）', theme:'採果逛工廠，帶著滿滿回憶回家',
+     img:['12-day3.jpg','早晨果園，家人提籃採水果'], trip:['13-day3-trip.png','水果籃、觀光工廠、琉璃建築、回家'],
+     items:[
+      ['','民宿出發',''],
+      ['','採果趣',''],
+      ['','樂活觀光工廠',''],
+      ['','琉璃仙境',''],
+      ['16:30','後龍水尾溫暖的家',''],
+      ['18:30','台北溫暖的家',''],
+     ]},
+};
+const OVERVIEW = {
+  1:['鹿港天后宮','鹿港導覽','王功漁港－海牛驛站','58甕仔雞','金村花園民宿'],
+  2:['八卦山大佛風景區','淺田屋日本料理','田尾公路花園','團康活動','晚會'],
+  3:['採果趣','樂活觀光工廠','琉璃仙境','台北溫暖的家'],
+};
+const LUKANG = [
+  ['阿嬤','爸','媽','二叔叔','二嬸嬸'],
+  ['大姐','姐夫','詩喬','羽妡','小臻','晏丞'],
+  ['三娘姑姑','姑丈','三叔叔','三嬸嬸','啟宏哥哥'],
+  ['大阿伯','大伯母','二阿姨','二姨丈','惠琪姐姐'],
+  ['君君','竑銘','禹丞','沛涵','Mala'],
+  ['柏霖','祈芸','柏勳','萱萱'],
+];
+const TIANWEI = [
+  ['阿嬤','三叔叔','三嬸嬸','Mala'],
+  ['三娘姑姑','姑丈','爸','媽'],
+  ['二叔叔','二嬸嬸','君君','竑銘'],
+  ['大阿伯','二姨丈','啟宏哥哥','惠琪姐姐'],
+  ['姐夫','大姐','詩喬','羽妡'],
+  ['大伯母','二阿姨','柏霖','祈芸'],
+  ['禹丞','沛涵','柏勳','萱萱'],
+  ['小臻','晏丞'],
+];
+const ROOMS = {
+  '主屋':[
+    ['101','三人房','阿嬤、Mala'],
+    ['102','雙人房','三叔叔夫妻'],
+    ['201','三人房','三娘姑姑夫妻'],
+    ['202','四人房','二叔叔一家'],
+    ['203','雙人房','柏霖、祈芸'],
+    ['205','四人房','大阿伯一家'],
+    ['206','三人房','二阿姨一家'],
+    ['301','六人房','爸媽、大姐一家'],
+    ['302','六人房','司機、領隊',true],
+  ],
+  '廂房':[
+    ['131','雙人房','柏勳、萱萱'],
+    ['132','四人房','小臻、晏丞'],
+    ['133','雙人房','禹丞、沛涵'],
+  ],
+};
+const PACK = [
+  ['身分證、健保卡'],['現金','小吃、伴手禮、採果'],['手機、充電線'],['行動電源'],
+  ['帽子、防曬乳'],['太陽眼鏡'],['薄外套','海邊風大、早晚涼'],['好走的運動鞋','兩天都會騎腳踏車'],
+  ['換洗衣物兩套'],['毛巾、拖鞋','團康會玩水'],['一套玩水後換的衣服','團康會玩水'],['盥洗用品'],['個人藥品、暈車藥'],['折疊傘'],['環保袋'],['水壺'],
+];
+
+const LEVELS = [
+  {n:1, name:'球球你別破', rows:[
+    ['目標',['不用手，把大水球從第一棒傳到最後一棒，放進臉盆']],
+    ['玩法',['用肩膀、背、肚子、下巴、膝蓋夾著傳','每隊 3 次機會，球破了從第 1 棒重來，計時不停']],
+    ['勝負',['時間最短的隊伍獲勝，3 顆都破直接判輸']],
+    ['懲罰',['輸隊被水攻 30 秒']]]},
+  {n:2, name:'這一瓢，我敬你', rows:[
+    ['目標',['猜拳贏了潑水，輸了想辦法擋']],
+    ['玩法',['從籤筒抽出 2 人上場','猜拳一拳定勝負，贏的人潑一瓢水','輸的人可以拿臉盆或雨傘擋']],
+    ['規則',['抽過的人不會再被抽到']]]},
+  {n:3, name:'濕身大逃殺', rows:[
+    ['目標',['找出藏好的水球和水槍，找到就開打']],
+    ['玩法',['一聲長哨開始，三聲短哨全員停手','水球、水槍藏在樹下、椅子下、草叢邊、倒扣的水桶裡','安全區不能攻擊，只能打肩膀以下']],
+    ['結束',['不分勝負，大家一起撿水球碎片']]]},
+  {n:4, name:'當我們同在一起', rows:[
+    ['目標',['手牽手唱歌，唱到關鍵字就做動作']],
+    ['玩法',['第一遍唱到「在一起」，牽著的手一起舉高','第二遍唱到「我」，全員蹲下']],
+    ['懲罰',['做錯的人到圓圈中間，帶大家唱下一遍']]]},
+  {n:5, name:'拜託你別笑……噗', rows:[
+    ['目標',['嘴咬紙牌傳麵粉，傳最多的隊伍獲勝']],
+    ['玩法',['每人嘴巴咬一張撲克牌','第 1 棒鏟麵粉，牌對牌傳到最後一棒倒進杯子','全程不能用手，掉到地上的麵粉不能撿']],
+    ['勝負',['限時 3 分鐘，杯裡麵粉最多的隊伍獲勝']],
+    ['懲罰',['輸隊抽 3 張懲罰籤']]]},
+  {n:6, name:'誰是我的枕邊人', rows:[
+    ['目標',['男生戴上眼罩，只靠摸一個部位，找出自己的另一半']],
+    ['玩法',['分三輪，每輪 4 對上場']],
+    ['大會四大鐵律',['摘配件｜禁出聲｜戴眼罩｜摸哪裡聽主持人']],
+    ['揭曉',['主持人數「3、2、1」，一起拿下眼罩']]]},
+];
+
+/* 美食連連看:3×3 賓果卡,中間是自由格子 */
+const FOOD = [
+  [1,'王罔麵線糊'],[2,'老龍師肉包'],[3,'好記粉粿冰'],
+  [4,'素珠芋丸'],[0,'家族創意合照'],[5,'鹿仔港魷魚肉羹'],
+  [6,'龍山麵線糊'],[7,'餅留香'],[8,'在地清涼茶飲'],
+];
+const FOOD_RULES = [
+  ['地點',['鹿港第一市場周邊']],
+  ['目標',['吃到賓果卡上的美食，連成一條線']],
+  ['玩法',['以鹿港導覽分組為一組','自由品嚐採買，每吃到一樣就拍照打卡，上傳家族群組','中間是自由格子：拍一張家族創意合照，跟三輪車或美食同框']],
+  ['勝負',['橫的、直的、斜的連成一線就達標','每組最先達成美食連線者獲勝']],
+  ['集合',['13:20 文武廟停車場遊覽車集合','13:40 開車前往王功']],
+];
+
+/* ===== 元件 ===== */
+const illus = (file, desc, cls='') =>
+  `<figure class="illus ${cls}"><img src="images/${file}" alt="${desc}" onerror="this.parentNode.classList.add('missing')"><figcaption><span class="ph-tag">插圖預留</span><span class="ph-desc">${desc}</span><span class="ph-file">images/${file}</span></figcaption></figure>`;
+const band = (t, chip) => `<div class="band"><span class="t">${t}</span>${chip?`<span class="chip">${chip}</span>`:''}</div>`;
+const star = '<div class="star-badge">★ 特別活動</div>';
+const names = arr => `<div class="names">${arr.map(n=>`<span class="name">${n}</span>`).join('')}</div>`;
+const tbd = (label, txt='（待補）') => `<div class="tbd"><b>${label}</b>${txt}</div>`;
+
+/* ===== 頁面 ===== */
+const P = [];
+P.push({id:'cover', toc:'封面', cls:'cover warm', html:()=>`
+  <div class="back-wrap cover-wrap">
+    <span class="pill">彰化三天兩夜</span>
+    <h1><span class="yr">2026</span>噗嚨共家族旅遊</h1>
+    <img class="logo" src="images/logo.png" alt="噗嚨共 Family Trip">
+    <div>
+      <div class="date">10/24（六）– 10/26（一）</div>
+      <p class="welcome">三天兩夜，一起把彰化的好風景帶回家！</p>
+    </div>
+    <div class="hint"><span>← 向左滑開始翻閱</span></div>
+  </div>`});
+
+P.push({id:'overview', toc:'行程總覽', cls:'warm', html:()=>`
+  ${band('行程總覽','三天兩夜')}
+  <div class="quick" aria-label="快速查看">
+    <button type="button" data-sheet="room">房間分配</button>
+    <button type="button" data-sheet="lukang">鹿港分組</button>
+    <button type="button" data-sheet="tianwei">田尾分組</button>
+    <button type="button" data-sheet="pack">必帶用品</button>
+    <button type="button" data-sheet="notice">注意事項</button>
+  </div>
+  <button type="button" class="shot tall" data-zoom="images/overview.jpg" aria-label="放大看三天行程圖">
+    <img src="images/overview.jpg" alt="2026噗嚨共家族旅遊三天行程圖"><span class="zoom">點圖放大</span>
+  </button>
+  <div class="daycards">${[1,2,3].map(d=>`
+    <button type="button" class="daycard day${d}" data-go="t${d}">
+      <span class="h">DAY ${d}<small>${DAYS[d].date}</small><span class="arr">›</span></span>
+      <ul>${OVERVIEW[d].map(x=>`<li>${x}</li>`).join('')}</ul>
+    </button>`).join('')}
+  </div>`});
+
+function dayPages(d){
+  const D = DAYS[d];
+  P.push({id:'t'+d, toc:`DAY ${d} 行程`, cls:`day${d}`, html:()=>`
+    <div class="dayhead">
+      ${illus(D.img[0], D.img[1])}
+      <div class="big">DAY ${d}</div>
+      <div class="date">${D.date}</div>
+      <p class="theme">${D.theme}</p>
+    </div>
+    <ol class="tl">${D.items.map(([t,title,note,link,extra])=>`
+      <li class="${link?'star':''}">
+        <div class="tl-time">${t}</div><div class="tl-dot"></div>
+        <div><div class="tl-title">${title}</div>${note?`<div class="tl-note">${note}</div>`:''}
+        ${link?`<button type="button" class="go" ${SHEETS[link[0]]?'data-sheet':'data-go'}="${link[0]}"><span class="s">★</span>${link[1]} ›</button>`:''}</div>
+      </li>`).join('')}
+    </ol>`});
+}
+
+/* 晚會:先吃外燴晚餐,再玩遊戲 */
+const MENU = ['烤乳豬','燒烤','關東煮'];
+const CATERING_IMG = () => `<button type="button" class="shot catering" data-zoom="images/18-catering.jpg" aria-label="放大看外燴餐車">${illus('18-catering.jpg','外燴餐車到民宿，家人排隊夾菜')}<span class="zoom">點圖放大</span></button>`;
+function partyFlowShort(){
+  return CATERING_IMG();
+}
+
+/* 關卡縮圖:點了在同一頁裡打開關卡,不佔頁數 */
+function levelCards(ns, act){
+  return `<div class="lvcards">${ns.map(n=>{const L=LEVELS[n-1];
+    return `<button type="button" class="lvcard" data-level="${n}" data-act="${act}">
+      <img src="images/level${n}.jpg" alt="">
+      <span><span class="n">第${n}關</span><span class="nm">${L.name}</span><span class="more">看玩法 ›</span></span>
+    </button>`}).join('')}</div>`;
+}
+function levelHTML(n, act, time){
+  const L = LEVELS[n-1];
+  return `${band(`第${n}關｜${L.name}`)}
+    <button type="button" class="shot" data-zoom="images/level${n}.jpg" aria-label="放大看第${n}關關卡圖">
+      <img src="images/level${n}.jpg" alt="第${n}關 ${L.name} 關卡圖"><span class="zoom">點圖放大</span>
+    </button>
+    <div class="rules">${L.rows.map(([lab,lines])=>`<div class="rule"><span class="lab">${lab}</span><div>${lines.map(x=>`<p>${x}</p>`).join('')}</div></div>`).join('')}</div>`;
+}
+
+/* 房間分配、分組名單:點了在原本那頁打開,不佔頁數 */
+const SHEETS = {
+  lukang:{cls:'day1', html:()=>`
+    ${band('鹿港導覽分組','10/24（六）')}${star}
+    <div class="frame">
+      <div class="intro"><div><div class="stat">6 組</div><p class="muted">鹿港天后宮拜拜、鹿港導覽</p></div>${illus('05-lukang.jpg','老街裡的鹿港導覽腳踏車')}</div>
+      <div class="grid">${LUKANG.map((g,i)=>`<div class="card"><h3>第${i+1}組<span class="seat">${g.length} 人</span></h3>${names(g)}</div>`).join('')}</div>
+    </div>`},
+  room:{cls:'day1', html:()=>`
+    ${band('房間分配','金村花園民宿')}
+    <div class="frame">
+      ${illus('06-room.jpg','傍晚亮燈的花園民宿，家人提行李入住','above')}
+      ${Object.entries(ROOMS).map(([k,list])=>`
+        <div class="sec">${k}</div>
+        <div class="rooms">${list.map(([no,type,who,staff])=>`<div class="room${staff?' staff':''}"><div class="no">${no}<span class="type">${type}</span></div><div class="who">${who}</div></div>`).join('')}</div>`).join('')}
+    </div>`},
+  food:{cls:'day1', title:'美食連連看', html:()=>`
+    ${band('美食連連看','午餐－鹿港美食')}${star}
+    <div class="frame">
+      <button type="button" class="shot free" data-zoom="images/food-bingo.jpg" aria-label="放大看鹿港美食尋寶地圖">
+        <img src="images/food-bingo.jpg" alt="鹿港老街美食獵人尋寶地圖"><span class="zoom">點圖放大</span>
+      </button>
+      <div class="bingo">${FOOD.map(([n,name])=>`<div class="${n?'':'free'}"><small>${n?`第${n}寶`:'自由格子'}</small>${name}</div>`).join('')}</div>
+      <div class="rules">${FOOD_RULES.map(([lab,lines])=>`<div class="rule"><span class="lab">${lab}</span><div>${lines.map(x=>`<p>${x}</p>`).join('')}</div></div>`).join('')}</div>
+    </div>`},
+  tianwei:{cls:'day2', html:()=>`
+    ${band('田尾腳踏車分組','10/25（日）')}${star}
+    <div class="frame">
+      <div class="intro"><div><div class="stat">8 台</div><p class="muted">田尾公路花園<br>1–7 號 4 人座<br>8 號 2 人座</p></div>${illus('09-tianwei.jpg','花海小路上的協力腳踏車隊')}</div>
+      <div class="grid">${TIANWEI.map((g,i)=>`<div class="card"><h3>${i+1}號車<span class="seat">${i===7?'2':'4'} 人座</span></h3>${names(g)}</div>`).join('')}</div>
+    </div>`},
+};
+
+dayPages(1);
+dayPages(2);
+P.push({id:'games', toc:'團康活動', star:true, cls:'day2', html:()=>`
+  ${band('團康活動','10/25（日）')}${star}
+  <div class="frame">
+    <div class="bigtime">16:15<small>團康活動</small></div>
+    ${levelCards([1,2,3],'games')}
+    <div class="tbds"><div class="info"><b>穿著建議</b>會玩水，穿可以濕的衣服，帶毛巾和拖鞋</div></div>
+  </div>`});
+P.push({id:'party', toc:'晚會', star:true, cls:'day2', html:()=>`
+  ${band('晚會','10/25（日）')}${star}
+  <div class="frame">
+    <div class="bigtime">18:00<small>晚會開始（晚餐、晚會活動）</small></div>
+    <div class="step"><span class="step-n">1</span><div class="step-h"><b>18:00</b>外燴餐車晚餐</div></div>
+    ${CATERING_IMG()}
+    <div class="menu">${MENU.map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="step"><span class="step-n">2</span><div class="step-h"><b>19:00</b>晚會遊戲</div></div>
+    ${levelCards([4,5,6],'party')}
+  </div>`});
+
+dayPages(3);
+P.push({id:'pack', toc:'必帶用品', cls:'warm', html:()=>`
+  ${band('必帶用品','點一下打勾')}
+  <div class="intro"><div><div class="stat"><span class="packCount">0</span><span style="font-size:20px"> / ${PACK.length}</span></div><p class="muted">已經準備好</p><div class="bar"><i class="packBar"></i></div></div>${illus('14-packing.jpg','打開的行李箱和旅行小物')}</div>
+  <div class="checks">${PACK.map(([a,b],i)=>`<button type="button" class="check" data-pack="${i}" aria-pressed="false"><span class="box"></span><span class="lbl">${a}${b?`<small>${b}</small>`:''}</span></button>`).join('')}</div>`});
+P.push({id:'notice', toc:'注意事項', cls:'warm', html:()=>`
+  ${band('注意事項','出發前看一下')}
+  ${illus('15-notice.jpg','舉小旗子的領隊溫馨提醒','above')}
+  <ol class="notes">
+    <li><div>準時到接點集合：<b>06:30</b> 五股、<b>07:00</b> 新莊文藝中心、<b>08:45</b> 後龍溫暖的家</div></li>
+    <li><div>週末景點和餐廳人多，排隊請多點耐心</div></li>
+    <li><div>騎腳踏車注意來車，小朋友由同車大人照顧</div></li>
+    <li><div>王功漁港風大、日曬強，注意防曬和保暖</div></li>
+    <li><div>多喝水，身體不舒服馬上告訴領隊</div></li>
+  </ol>`});
+P.push({id:'back', toc:'封底', cls:'cover back warm', html:()=>`
+  <div class="back-wrap">
+    <span class="pill">2026噗嚨共家族旅遊</span>
+    <img class="logo" src="images/logo.png" alt="噗嚨共 Family Trip">
+    <h1>謝謝每位家人，<br>期待下次再一起出發！</h1>
+  </div>`});
+
+function pg(id){ return P.findIndex(p=>p.id===id)+1; }
+/* 總覽的快捷按鈕:必帶用品、注意事項也在原頁打開,有返回按鈕 */
+SHEETS.pack = {cls:'warm', html:P[pg('pack')-1].html, after:()=>renderPack()};
+SHEETS.notice = {cls:'warm', html:P[pg('notice')-1].html};
+/* DAY 2 行程點團康、晚會:也在原頁打開,有返回按鈕 */
+SHEETS.games = {cls:'day2', title:'團康活動', html:P[pg('games')-1].html};
+SHEETS.party = {cls:'day2', title:'晚會', html:P[pg('party')-1].html};
+
+/* ===== 翻頁 ===== */
+const track = document.getElementById('track');
+const book = document.getElementById('book');
+track.innerHTML = P.map((p,k)=>`<section class="page ${p.cls}" aria-label="第 ${k+1} 頁：${p.toc}">${p.html()}</section>`).join('');
+const pages = [...track.children];
+const N = pages.length;
+const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next'), homeBtn = document.getElementById('home');
+const pageno = document.getElementById('pageno'), tocBtn = document.getElementById('tocBtn');
+const navColor = {day1:'--d1',day2:'--d2',day3:'--d3',warm:'--w'};
+let cur = 0;
+
+const topbar = document.getElementById('topbar'), where = document.getElementById('where');
+function barLabel(k){
+  const c = pages[k].classList;
+  if (c.contains('cover')) return null;
+  const d = [1,2,3].find(d=>c.contains('day'+d));
+  return d ? `DAY ${d}・${DAYS[d].date}` : P[k].toc;
+}
+function go(n, instant){
+  n = Math.max(0, Math.min(N-1, n));
+  if (n !== cur){   // 每一頁都從最上方開始,快捷按鈕列也回到第一個
+    pages[n].scrollTop = 0;
+    pages[n].querySelectorAll('.quick').forEach(q=>{ q.scrollLeft = 0; });
+  }
+  cur = n;
+  track.style.transition = instant ? 'none' : '';
+  track.style.transform = `translateX(${-cur*100}%)`;
+  pages.forEach((p,k)=>{ p.inert = k!==cur; });
+  prevBtn.classList.toggle('hide', cur===0);
+  nextBtn.hidden = cur===N-1;          // 封底:下一頁的位置換成「回首頁」
+  homeBtn.hidden = cur!==N-1;
+  pageno.textContent = `${cur+1} / ${N}`;
+  const label = barLabel(cur);
+  topbar.hidden = !label;
+  where.textContent = label || '';
+  tocBtn.hidden = P[cur].id==='overview';
+  const key = Object.keys(navColor).find(k=>pages[cur].classList.contains(k)) || 'warm';
+  book.style.setProperty('--nav', `var(${navColor[key]})`);
+  book.style.setProperty('--bar', pages[cur].classList.contains('tint') ? `var(${navColor[key]}s)` : 'var(--paper)');
+  try{ history.replaceState(null,'','#p'+(cur+1)); }catch(e){}
+}
+prevBtn.onclick = ()=>go(cur-1);
+nextBtn.onclick = ()=>go(cur+1);
+homeBtn.onclick = ()=>go(0);
+tocBtn.onclick = ()=>go(pg('overview')-1);
+
+/* 關卡:嵌在團康、晚會頁裡打開 */
+const lv = document.getElementById('lv'), lvBody = document.getElementById('lvBody'), lvBack = document.getElementById('lvBack');
+const ACT = {games:['團康','16:15'], party:['晚會','18:00']};
+/* 可以一層一層打開(例:DAY 2 → 團康 → 第1關),返回時一層一層退回 */
+const stack = [];
+function renderTop(){
+  const top = stack[stack.length-1], prev = stack[stack.length-2];
+  lvBody.innerHTML = top.html;
+  lv.className = 'lv ' + top.cls;
+  const label = prev ? prev.title : P[cur].toc;
+  lvBack.textContent = '‹ 返回' + (/^[A-Z]/.test(label) ? ' ' : '') + label;
+  lvBody.scrollTop = 0;
+  if (top.after) top.after();
+}
+function openSheet(html, cls, title, after){
+  stack.push({html, cls, title, after});
+  lv.hidden = false; book.classList.add('lv-open');
+  renderTop();
+}
+function closeLevel(){
+  stack.pop();
+  if (stack.length) renderTop();
+  else { lv.hidden = true; book.classList.remove('lv-open'); }
+}
+lvBack.onclick = closeLevel;
+document.addEventListener('click', e=>{
+  const c = e.target.closest('[data-level]');
+  if (c){ const [name, time] = ACT[c.dataset.act]; openSheet(levelHTML(+c.dataset.level, name, time), 'day2'); return; }
+  const s = e.target.closest('[data-sheet]');
+  if (s){ const S = SHEETS[s.dataset.sheet]; openSheet(S.html(), S.cls, S.title, S.after); }
+});
+/* 關卡圖放大 */
+const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg');
+function closeLb(){ lb.hidden = true; lbImg.removeAttribute('src'); }
+document.getElementById('lbClose').onclick = closeLb;
+lb.addEventListener('click', e=>{ if (e.target===lb) closeLb(); });
+document.addEventListener('click', e=>{
+  const z = e.target.closest('[data-zoom]'); if (!z || z.querySelector('.illus.missing')) return;
+  lbImg.src = z.dataset.zoom; lbImg.alt = z.getAttribute('aria-label') || ''; lb.hidden = false;
+});
+document.addEventListener('keydown', e=>{
+  if (!lb.hidden){ if (e.key==='Escape') closeLb(); return; }
+  if (!lv.hidden){ if (e.key==='Escape') closeLevel(); return; }
+  if (e.key==='ArrowRight') go(cur+1);
+  else if (e.key==='ArrowLeft') go(cur-1);
+});
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-go]');
+  if (b) go(pg(b.dataset.go)-1);
+});
+window.addEventListener('hashchange', ()=>{
+  const h = /^#p(\d+)$/.exec(location.hash); if (h && +h[1]-1 !== cur) go(+h[1]-1);
+});
+book.addEventListener('scroll', ()=>{ book.scrollLeft = 0; });
+
+/* 觸控滑動:手指向左滑 → 下一頁,向右滑 → 上一頁 */
+/* 一開始滑就鎖定方向:左右 → 只翻頁、不捲動;上下 → 只捲動、不翻頁 */
+let x0=0, y0=0, dx=0, dir=null;
+track.addEventListener('touchstart', e=>{
+  if (e.touches.length > 1 || e.target.closest('.quick')){ dir = 'none'; return; }   // 快捷按鈕列自己左右捲,不翻頁
+  const t = e.touches[0]; x0=t.clientX; y0=t.clientY; dx=0; dir=null;
+},{passive:true});
+track.addEventListener('touchmove', e=>{
+  if (dir==='none' || e.touches.length > 1){ dir = dir==='h' ? 'h' : 'none'; return; }
+  const t = e.touches[0]; const mx=t.clientX-x0, my=t.clientY-y0;
+  if (dir===null){
+    if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
+    dir = Math.abs(mx) > Math.abs(my) * 1.2 ? 'h' : 'v';
+  }
+  if (dir!=='h') return;
+  e.preventDefault();   // 左右滑時不讓頁面上下動
+  const w = track.clientWidth;
+  dx = Math.max(-w, Math.min(w, mx));
+  const edge = (cur===0 && dx>0) || (cur===N-1 && dx<0);
+  track.style.transition = 'none';
+  track.style.transform = `translateX(calc(${-cur*100}% + ${edge?dx*0.25:dx}px))`;
+},{passive:false});
+function endSwipe(){
+  if (dir==='h'){
+    if (dx < -50) go(cur+1); else if (dx > 50) go(cur-1); else go(cur);
+  }
+  dir = null; dx = 0;
+}
+track.addEventListener('touchend', endSwipe);
+track.addEventListener('touchcancel', endSwipe);
+
+/* 必帶用品勾選(只存在自己的手機) */
+const PKEY = 'pulonggong2026-pack';
+let packed = [];
+try{ packed = JSON.parse(localStorage.getItem(PKEY)) || []; }catch(e){ packed = []; }
+function renderPack(){
+  document.querySelectorAll('[data-pack]').forEach(b=>{
+    const on = packed.includes(+b.dataset.pack);
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  });
+  document.querySelectorAll('.packCount').forEach(el=>{ el.textContent = packed.length; });
+  document.querySelectorAll('.packBar').forEach(el=>{ el.style.width = (packed.length/PACK.length*100)+'%'; });
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-pack]'); if (!b) return;
+  const i = +b.dataset.pack;
+  packed = packed.includes(i) ? packed.filter(x=>x!==i) : [...packed, i];
+  try{ localStorage.setItem(PKEY, JSON.stringify(packed)); }catch(e){}
+  renderPack();
+});
+renderPack();
+
+const m = /^#p(\d+)$/.exec(location.hash);
+cur = -1;
+go(m ? +m[1]-1 : 0, true);   // 打開時直接停在該頁,不播放滑動動畫
+</script>
+</body>
+</html>
