@@ -34,6 +34,8 @@ html,body{overflow:hidden;overscroll-behavior:none}
 body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:10px}
+img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
+.track{-webkit-user-select:none;user-select:none}
 
 .day1{--c:var(--d1);--cs:var(--d1s)}
 .day2{--c:var(--d2);--cs:var(--d2s)}
@@ -705,35 +707,65 @@ window.addEventListener('hashchange', ()=>{
 book.addEventListener('scroll', ()=>{ book.scrollLeft = 0; });
 
 /* 觸控滑動:手指向左滑 → 下一頁,向右滑 → 上一頁 */
-/* 一開始滑就鎖定方向:左右 → 只翻頁、不捲動;上下 → 只捲動、不翻頁 */
-let x0=0, y0=0, dx=0, dir=null;
+/* 觸控翻頁:手指向左滑 → 下一頁,向右滑 → 上一頁
+   一開始就判斷方向;就算一開始被當成上下捲動,放開手時整體是明顯的左右滑,一樣翻頁 */
+let x0=0, y0=0, dx=0, dir=null, t0=0;
 track.addEventListener('touchstart', e=>{
   if (e.touches.length > 1 || e.target.closest('.quick')){ dir = 'none'; return; }   // 快捷按鈕列自己左右捲,不翻頁
-  const t = e.touches[0]; x0=t.clientX; y0=t.clientY; dx=0; dir=null;
+  const t = e.touches[0]; x0=t.clientX; y0=t.clientY; dx=0; dir=null; t0=Date.now();
 },{passive:true});
 track.addEventListener('touchmove', e=>{
-  if (dir==='none' || e.touches.length > 1){ dir = dir==='h' ? 'h' : 'none'; return; }
+  if (dir==='none') return;
+  if (e.touches.length > 1){ dir='none'; go(cur); return; }
   const t = e.touches[0]; const mx=t.clientX-x0, my=t.clientY-y0;
   if (dir===null){
-    if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
-    dir = Math.abs(mx) > Math.abs(my) * 1.2 ? 'h' : 'v';
+    if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+    dir = Math.abs(mx) >= Math.abs(my) ? 'h' : 'v';
   }
   if (dir!=='h') return;
-  e.preventDefault();   // 左右滑時不讓頁面上下動
+  if (e.cancelable) e.preventDefault();   // 左右滑時不讓頁面上下動
   const w = track.clientWidth;
   dx = Math.max(-w, Math.min(w, mx));
   const edge = (cur===0 && dx>0) || (cur===N-1 && dx<0);
   track.style.transition = 'none';
   track.style.transform = `translateX(calc(${-cur*100}% + ${edge?dx*0.25:dx}px))`;
 },{passive:false});
-function endSwipe(){
-  if (dir==='h'){
-    if (dx < -50) go(cur+1); else if (dx > 50) go(cur-1); else go(cur);
-  }
+function endSwipe(e){
+  if (dir==='none'){ dir=null; return; }
+  const t = e && e.changedTouches && e.changedTouches[0];
+  const fx = t ? t.clientX-x0 : dx, fy = t ? t.clientY-y0 : 0;
+  const quick = Date.now()-t0 < 400;
+  // 左右滑:超過 50px,或很快地甩一下超過 30px
+  const flip = dir==='h' ? (Math.abs(fx) > 50 || (quick && Math.abs(fx) > 30))
+                         : (Math.abs(fx) > 70 && Math.abs(fx) > Math.abs(fy)*1.5);
+  if (flip) go(fx < 0 ? cur+1 : cur-1); else if (dir==='h') go(cur);
   dir = null; dx = 0;
 }
 track.addEventListener('touchend', endSwipe);
-track.addEventListener('touchcancel', endSwipe);
+track.addEventListener('touchcancel', ()=>{ if (dir==='h') go(cur); dir=null; dx=0; });
+
+/* 電腦:觸控板兩指左右滑 */
+let wheelX = 0, wheelLock = 0;
+book.addEventListener('wheel', e=>{
+  if (!lv.hidden || !lb.hidden) return;
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+  if (e.target.closest('.quick')) return;
+  e.preventDefault();
+  if (Date.now() < wheelLock) return;
+  wheelX += e.deltaX;
+  if (Math.abs(wheelX) > 60){ go(wheelX > 0 ? cur+1 : cur-1); wheelX = 0; wheelLock = Date.now() + 700; }
+},{passive:false});
+
+/* 電腦:滑鼠按住左右拖 */
+let mx0 = null, my0 = 0, mDragged = false;
+track.addEventListener('pointerdown', e=>{ if (e.pointerType==='mouse' && e.button===0 && !e.target.closest('.quick')){ mx0=e.clientX; my0=e.clientY; mDragged=false; } });
+window.addEventListener('pointerup', e=>{
+  if (mx0===null || e.pointerType!=='mouse') return;
+  const fx = e.clientX-mx0, fy = e.clientY-my0; mx0 = null;
+  if (Math.abs(fx) > 60 && Math.abs(fx) > Math.abs(fy)*1.5){ mDragged = true; go(fx < 0 ? cur+1 : cur-1); }
+});
+track.addEventListener('click', e=>{ if (mDragged){ e.stopPropagation(); e.preventDefault(); mDragged=false; } }, true);
+track.addEventListener('dragstart', e=>e.preventDefault());
 
 /* 必帶用品勾選(只存在自己的手機) */
 const PKEY = 'pulonggong2026-pack';
