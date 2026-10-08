@@ -749,6 +749,7 @@ document.addEventListener('click', e=>{
 const cap = document.getElementById('cap');
 let secretTaps = [];
 function capAsk(){
+  CAPTAINS.forEach(c=>{ new Image().src = 'images/'+c[2]; });   // 問「準備好了嗎」時先在背景載入頭像,按打開就直接出現
   cap.innerHTML = `<div class="cap-box cap-ask">
     <div class="big">🎁</div>
     <h2>被你發現這個秘密了，<br>準備好打開了嗎？</h2>
