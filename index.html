@@ -221,11 +221,17 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 .rule:nth-child(5) .lab{background:var(--w)}
 /* 美食連連看 */
 .shot.free img{aspect-ratio:auto}
-.bingo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
-.bingo div{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:15px;font-weight:700;line-height:1.35;display:flex;flex-direction:column;justify-content:center}
+.bingo-wrap{position:relative;margin-top:8px}
+.bingo-wrap svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.bingo-wrap line{stroke:#E0302A;stroke-width:5;stroke-linecap:round;opacity:.75}
+.bingo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:6px}
+.bingo > *{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:15px;font-weight:700;line-height:1.35;display:flex;flex-direction:column;justify-content:center}
 .bingo small{display:block;font-size:12px;font-weight:700;color:var(--c)}
 .bingo .free{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
 .bingo .free small{color:var(--gold-ink)}
+.bingo button{cursor:pointer}
+.bingo button.on{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.bingo button.on small{color:var(--gold-ink)}
 .rule p{font-size:18px;line-height:1.55}
 .rule p + p{margin-top:4px}
 .lb{position:absolute;inset:0;z-index:20;background:rgba(40,30,22,.92);display:flex;align-items:center;justify-content:center;padding:16px;touch-action:pinch-zoom}
@@ -538,13 +544,18 @@ const SHEETS = {
         <div class="sec">${k}</div>
         <div class="rooms">${list.map(([no,type,who,staff])=>`<div class="room${staff?' staff':''}"><div class="no">${no}<span class="type">${type}</span></div><div class="who">${who}</div></div>`).join('')}</div>`).join('')}
     </div>`},
-  food:{cls:'day1', title:'美食連連看', html:()=>`
+  food:{cls:'day1', title:'美食連連看', after:()=>renderBingo(), html:()=>`
     ${band('美食連連看','午餐－鹿港美食')}${star}
     <div class="frame">
       <button type="button" class="shot free" data-zoom="images/food-bingo.jpg" aria-label="放大看鹿港美食尋寶地圖">
         <img src="images/food-bingo.jpg" alt="鹿港老街美食獵人尋寶地圖"><span class="zoom">點圖放大</span>
       </button>
-      <div class="bingo">${FOOD.map(([n,name])=>`<div class="${n?'':'free'}"><small>${n?`第${n}寶`:'自由格子'}</small>${name}</div>`).join('')}</div>
+      <div class="bingo-wrap">
+        <div class="bingo">${FOOD.map(([n,name],i)=>n
+          ? `<button type="button" data-bingo="${i}" aria-pressed="false"><small>第${n}寶</small>${name}</button>`
+          : `<div class="free" data-bingo="${i}"><small>自由格子</small>${name}</div>`).join('')}</div>
+        <svg aria-hidden="true"></svg>
+      </div>
       <div class="rules">${FOOD_RULES.map(([lab,lines])=>`<div class="rule"><span class="lab">${lab}</span><div>${lines.map(x=>`<p>${x}</p>`).join('')}</div></div>`).join('')}</div>
     </div>`},
   tianwei:{cls:'day2', html:()=>`
@@ -595,7 +606,7 @@ P.push({id:'back', toc:'封底', cls:'cover back warm', html:()=>`
   <div class="back-wrap">
     <span class="pill">2026噗嚨共家族旅遊</span>
     <img class="logo" src="images/logo.png" alt="噗嚨共 Family Trip">
-    <h1>謝謝每位家人，<br>期待下次再一起出發！</h1>
+    <h1>謝謝每位家人<br>期待下一次的旅行！</h1>
   </div>`});
 
 function pg(id){ return P.findIndex(p=>p.id===id)+1; }
@@ -788,6 +799,38 @@ document.addEventListener('click', e=>{
   renderPack();
 });
 renderPack();
+
+/* 美食連連看:點格子上色,再點取消;中間自由格子固定上色。連成一線畫紅線(只存在自己的手機) */
+const BKEY = 'pulonggong2026-bingo';
+const BLINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let bingoOn = [];
+try{ bingoOn = JSON.parse(localStorage.getItem(BKEY)) || []; }catch(e){ bingoOn = []; }
+function renderBingo(){
+  const wrap = lvBody.querySelector('.bingo-wrap'); if (!wrap) return;
+  const cells = [...wrap.querySelectorAll('[data-bingo]')];
+  const done = i => !FOOD[i][0] || bingoOn.includes(i);
+  cells.forEach(b=>{
+    if (b.tagName !== 'BUTTON') return;
+    const on = bingoOn.includes(+b.dataset.bingo);
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  });
+  const W = wrap.getBoundingClientRect(), svg = wrap.querySelector('svg');
+  svg.setAttribute('viewBox', `0 0 ${W.width} ${W.height}`);
+  const mid = i => { const r = cells[i].getBoundingClientRect(); return [r.left-W.left+r.width/2, r.top-W.top+r.height/2]; };
+  svg.innerHTML = BLINES.filter(l=>l.every(done)).map(l=>{
+    const [x1,y1] = mid(l[0]), [x2,y2] = mid(l[2]);
+    const len = Math.hypot(x2-x1, y2-y1) || 1, ex = (x2-x1)/len*18, ey = (y2-y1)/len*18;   // 線頭稍微超出格子中心
+    return `<line x1="${x1-ex}" y1="${y1-ey}" x2="${x2+ex}" y2="${y2+ey}"/>`;
+  }).join('');
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('button[data-bingo]'); if (!b) return;
+  const i = +b.dataset.bingo;
+  bingoOn = bingoOn.includes(i) ? bingoOn.filter(x=>x!==i) : [...bingoOn, i];
+  try{ localStorage.setItem(BKEY, JSON.stringify(bingoOn)); }catch(e){}
+  renderBingo();
+});
+window.addEventListener('resize', renderBingo);
 
 const m = /^#p(\d+)$/.exec(location.hash);
 cur = -1;
