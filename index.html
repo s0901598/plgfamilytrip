@@ -260,6 +260,9 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 .where{background:var(--nav,var(--w));color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .toc-btn{margin-left:auto;flex:0 0 auto;background:var(--card);border:2px solid var(--nav,var(--w));color:var(--nav,var(--w));border-radius:999px;padding:3px 14px;font-weight:700;font-size:16px;cursor:pointer}
 .toc-btn[hidden]{display:none}
+/* 每頁自己的 top bar:黏在頁面最上面,內容捲動時從它下面經過 */
+.page > .pbar{position:sticky;top:-74px;margin:-74px -20px 18px;background:var(--paper);--nav:var(--c)}
+.page.tint > .pbar{background:var(--cs)}
 
 /* 晚會流程 */
 .flow{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-left:12px;border-left:3px solid var(--cs)}
@@ -335,10 +338,6 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 <div class="stage">
   <div class="book" id="book">
     <div class="track" id="track"></div>
-    <header class="topbar" id="topbar">
-      <span class="where" id="where"></span>
-      <button class="toc-btn" id="tocBtn" type="button">總覽</button>
-    </header>
     <div class="lv day2" id="lv" hidden role="dialog" aria-label="詳細內容">
       <header class="topbar"><button type="button" class="back-btn" id="lvBack">‹ 返回</button></header>
       <div class="lv-body" id="lvBody"></div>
@@ -667,21 +666,22 @@ SHEETS.party = {cls:'day2', title:'晚會', html:P[pg('party')-1].html};
 /* ===== 翻頁 ===== */
 const track = document.getElementById('track');
 const book = document.getElementById('book');
-track.innerHTML = P.map((p,k)=>`<section class="page ${p.cls}" aria-label="第 ${k+1} 頁：${p.toc}">${p.html()}</section>`).join('');
+/* top bar 放在每一頁裡,跟著頁面一起左右滑,不會等翻完才換 */
+function barLabel(k){
+  const c = P[k].cls.split(' ');
+  if (c.includes('cover')) return null;
+  const d = [1,2,3].find(d=>c.includes('day'+d));
+  return d ? `DAY ${d}・${DAYS[d].date}` : P[k].toc;
+}
+const pageBar = k => { const label = barLabel(k); return label ? `<header class="topbar pbar"><span class="where">${label}</span>${P[k].id!=='overview'?'<button class="toc-btn" type="button" data-go="overview">總覽</button>':''}</header>` : ''; };
+track.innerHTML = P.map((p,k)=>`<section class="page ${p.cls}" aria-label="第 ${k+1} 頁：${p.toc}">${pageBar(k)}${p.html()}</section>`).join('');
 const pages = [...track.children];
 const N = pages.length;
 const prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next'), homeBtn = document.getElementById('home');
-const pageno = document.getElementById('pageno'), tocBtn = document.getElementById('tocBtn');
+const pageno = document.getElementById('pageno');
 const navColor = {day1:'--d1',day2:'--d2',day3:'--d3',warm:'--w'};
 let cur = 0;
 
-const topbar = document.getElementById('topbar'), where = document.getElementById('where');
-function barLabel(k){
-  const c = pages[k].classList;
-  if (c.contains('cover')) return null;
-  const d = [1,2,3].find(d=>c.contains('day'+d));
-  return d ? `DAY ${d}・${DAYS[d].date}` : P[k].toc;
-}
 const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 function go(n, instant){
   n = Math.max(0, Math.min(N-1, n));
@@ -690,23 +690,23 @@ function go(n, instant){
     pages[n].querySelectorAll('.quick').forEach(q=>{ q.scrollLeft = 0; });
   }
   cur = n;
-  track.scrollTo({left: cur*track.clientWidth, behavior: instant||reduceMotion ? 'auto' : 'smooth'});
+  sliding = !instant && !reduceMotion;   // 按鈕翻頁的平滑捲動途中,底部翻頁列不跟著中間經過的頁變
+  track.scrollTo({left: cur*track.clientWidth, behavior: sliding ? 'smooth' : 'auto'});
   render(instant);
 }
-/* 更新頁碼、top bar、翻頁按鈕(手指滑完停下來時也會呼叫) */
+/* 底部翻頁列:頁碼、顏色、上一頁/下一頁/回首頁 */
+function renderNav(k){
+  prevBtn.classList.toggle('hide', k===0);
+  nextBtn.hidden = k===N-1;          // 封底:下一頁的位置換成「回首頁」
+  homeBtn.hidden = k!==N-1;
+  pageno.textContent = `${k+1} / ${N}`;
+  const key = Object.keys(navColor).find(c=>pages[k].classList.contains(c)) || 'warm';
+  book.style.setProperty('--nav', `var(${navColor[key]})`);
+}
+/* 換頁完成:翻頁列、可操作的頁、網址 */
 function render(instant){
   pages.forEach((p,k)=>{ p.inert = k!==cur; });
-  prevBtn.classList.toggle('hide', cur===0);
-  nextBtn.hidden = cur===N-1;          // 封底:下一頁的位置換成「回首頁」
-  homeBtn.hidden = cur!==N-1;
-  pageno.textContent = `${cur+1} / ${N}`;
-  const label = barLabel(cur);
-  topbar.hidden = !label;
-  where.textContent = label || '';
-  tocBtn.hidden = P[cur].id==='overview';
-  const key = Object.keys(navColor).find(k=>pages[cur].classList.contains(k)) || 'warm';
-  book.style.setProperty('--nav', `var(${navColor[key]})`);
-  book.style.setProperty('--bar', pages[cur].classList.contains('tint') ? `var(${navColor[key]}s)` : 'var(--paper)');
+  renderNav(cur);
   try{ history.replaceState(null,'','#p'+(cur+1)); }catch(e){}
   if (instant) resetOthers();
 }
@@ -715,18 +715,21 @@ function resetOthers(){
   pages.forEach((p,k)=>{ if (k!==cur){ p.scrollTop = 0; p.querySelectorAll('.quick').forEach(q=>{ q.scrollLeft = 0; }); } });
 }
 /* 手指左右滑:手機原生捲動 + 一次停在一頁;停下來後才換頁碼 */
-let settleTimer = 0;
+let settleTimer = 0, sliding = false;
 function settle(){
+  sliding = false;
   const k = Math.round(track.scrollLeft / track.clientWidth);
   if (k !== cur){ cur = Math.max(0, Math.min(N-1, k)); render(); }
   resetOthers();
 }
-track.addEventListener('scroll', ()=>{ clearTimeout(settleTimer); settleTimer = setTimeout(settle, 120); }, {passive:true});
+track.addEventListener('scroll', ()=>{
+  if (!sliding) renderNav(Math.max(0, Math.min(N-1, Math.round(track.scrollLeft / track.clientWidth))));   // 手指滑過一半,頁碼就跟著換
+  clearTimeout(settleTimer); settleTimer = setTimeout(settle, 120);
+}, {passive:true});
 window.addEventListener('resize', ()=>{ track.scrollTo({left: cur*track.clientWidth, behavior:'auto'}); });
 prevBtn.onclick = ()=>go(cur-1);
 nextBtn.onclick = ()=>go(cur+1);
 homeBtn.onclick = ()=>go(0);
-tocBtn.onclick = ()=>go(pg('overview')-1);
 
 /* 關卡:嵌在團康、晚會頁裡打開 */
 const lv = document.getElementById('lv'), lvBody = document.getElementById('lvBody'), lvBack = document.getElementById('lvBack');
