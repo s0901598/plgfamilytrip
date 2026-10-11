@@ -49,8 +49,10 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 @media (min-width:600px){
   .book{height:min(94%,920px);border-radius:32px;box-shadow:0 24px 60px rgba(74,59,47,.22)}
 }
-.track{display:flex;height:100%;transition:transform .32s ease;will-change:transform}
-.page{flex:0 0 100%;min-width:0;height:100%;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain;padding:74px 20px 112px;position:relative;background:var(--paper)}
+.track{display:flex;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.track::-webkit-scrollbar{display:none}
+/* 翻頁用手機原生的左右捲動:由手機自己鎖定左右或上下,左右滑時頁面不會上下跑 */
+.page{flex:0 0 100%;min-width:0;height:100%;overflow-y:auto;overflow-x:hidden;touch-action:manipulation;overscroll-behavior-y:contain;scroll-snap-align:start;scroll-snap-stop:always;padding:74px 20px 112px;position:relative;background:var(--paper)}
 .page.tint{background:var(--cs)}
 
 /* 標題色帶 */
@@ -324,7 +326,6 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 @keyframes capIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){
-  .track{transition:none}
   .hint span{animation:none}
   .cap-box,.star-badge[data-secret]{animation:none!important}
 }
@@ -681,6 +682,7 @@ function barLabel(k){
   const d = [1,2,3].find(d=>c.contains('day'+d));
   return d ? `DAY ${d}・${DAYS[d].date}` : P[k].toc;
 }
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 function go(n, instant){
   n = Math.max(0, Math.min(N-1, n));
   if (n !== cur){   // 每一頁都從最上方開始,快捷按鈕列也回到第一個
@@ -688,8 +690,11 @@ function go(n, instant){
     pages[n].querySelectorAll('.quick').forEach(q=>{ q.scrollLeft = 0; });
   }
   cur = n;
-  track.style.transition = instant ? 'none' : '';
-  track.style.transform = `translateX(${-cur*100}%)`;
+  track.scrollTo({left: cur*track.clientWidth, behavior: instant||reduceMotion ? 'auto' : 'smooth'});
+  render(instant);
+}
+/* 更新頁碼、top bar、翻頁按鈕(手指滑完停下來時也會呼叫) */
+function render(instant){
   pages.forEach((p,k)=>{ p.inert = k!==cur; });
   prevBtn.classList.toggle('hide', cur===0);
   nextBtn.hidden = cur===N-1;          // 封底:下一頁的位置換成「回首頁」
@@ -705,11 +710,19 @@ function go(n, instant){
   try{ history.replaceState(null,'','#p'+(cur+1)); }catch(e){}
   if (instant) resetOthers();
 }
-/* 翻頁動畫結束後,其他頁先回到最上面,下次滑到交界處不會看到頁面跳動 */
+/* 翻頁停下來後,其他頁先回到最上面,下次滑到交界處不會看到頁面跳動 */
 function resetOthers(){
   pages.forEach((p,k)=>{ if (k!==cur){ p.scrollTop = 0; p.querySelectorAll('.quick').forEach(q=>{ q.scrollLeft = 0; }); } });
 }
-track.addEventListener('transitionend', e=>{ if (e.target===track) resetOthers(); });
+/* 手指左右滑:手機原生捲動 + 一次停在一頁;停下來後才換頁碼 */
+let settleTimer = 0;
+function settle(){
+  const k = Math.round(track.scrollLeft / track.clientWidth);
+  if (k !== cur){ cur = Math.max(0, Math.min(N-1, k)); render(); }
+  resetOthers();
+}
+track.addEventListener('scroll', ()=>{ clearTimeout(settleTimer); settleTimer = setTimeout(settle, 120); }, {passive:true});
+window.addEventListener('resize', ()=>{ track.scrollTo({left: cur*track.clientWidth, behavior:'auto'}); });
 prevBtn.onclick = ()=>go(cur-1);
 nextBtn.onclick = ()=>go(cur+1);
 homeBtn.onclick = ()=>go(0);
@@ -798,10 +811,12 @@ cap.addEventListener('click', e=>{
   if (b.dataset.cap==='close') closeCap(); else capCard(+b.dataset.cap);
 });
 document.addEventListener('keydown', e=>{
-  if (!cap.hidden){ if (e.key==='Escape') closeCap(); e.stopImmediatePropagation(); }
+  if (!cap.hidden){ if (e.key==='Escape') closeCap(); if (e.key==='ArrowRight' || e.key==='ArrowLeft') e.preventDefault(); e.stopImmediatePropagation(); }
 }, true);
 
 document.addEventListener('keydown', e=>{
+  const arrow = e.key==='ArrowRight' || e.key==='ArrowLeft';
+  if (arrow) e.preventDefault();   // 方向鍵只由這裡翻頁,不讓瀏覽器自己左右捲
   if (!lb.hidden){ if (e.key==='Escape') closeLb(); return; }
   if (!lv.hidden){ if (e.key==='Escape') closeLevel(); return; }
   if (e.key==='ArrowRight') go(cur+1);
@@ -816,43 +831,6 @@ window.addEventListener('hashchange', ()=>{
 });
 book.addEventListener('scroll', ()=>{ book.scrollLeft = 0; });
 
-/* 觸控滑動:手指向左滑 → 下一頁,向右滑 → 上一頁 */
-/* 觸控翻頁:手指向左滑 → 下一頁,向右滑 → 上一頁
-   一開始就鎖定方向:左右滑只翻頁、頁面不上下動;上下捲動時不翻頁 */
-let x0=0, y0=0, dx=0, dir=null, t0=0;
-track.addEventListener('touchstart', e=>{
-  if (e.touches.length > 1 || e.target.closest('.quick')){ dir = 'none'; return; }   // 快捷按鈕列自己左右捲,不翻頁
-  const t = e.touches[0]; x0=t.clientX; y0=t.clientY; dx=0; dir=null; t0=Date.now();
-},{passive:true});
-track.addEventListener('touchmove', e=>{
-  if (dir==='none') return;
-  if (e.touches.length > 1){ dir='none'; go(cur); return; }
-  const t = e.touches[0]; const mx=t.clientX-x0, my=t.clientY-y0;
-  if (dir===null){
-    // 還沒判斷出方向前,只要偏左右就先擋住上下捲動,頁面才不會先往上跑
-    if (Math.abs(mx) < 6 && Math.abs(my) < 6){ if (Math.abs(mx) >= Math.abs(my) && e.cancelable) e.preventDefault(); return; }
-    dir = Math.abs(mx) >= Math.abs(my)*0.7 ? 'h' : 'v';   // 斜一點也算左右滑;要比較明顯的上下才算捲動
-  }
-  if (dir!=='h') return;
-  if (e.cancelable) e.preventDefault();   // 左右滑時不讓頁面上下動
-  const w = track.clientWidth;
-  dx = Math.max(-w, Math.min(w, mx));
-  const edge = (cur===0 && dx>0) || (cur===N-1 && dx<0);
-  track.style.transition = 'none';
-  track.style.transform = `translateX(calc(${-cur*100}% + ${edge?dx*0.25:dx}px))`;
-},{passive:false});
-function endSwipe(e){
-  if (dir==='none'){ dir=null; return; }
-  const t = e && e.changedTouches && e.changedTouches[0];
-  const fx = t ? t.clientX-x0 : dx;
-  const quick = Date.now()-t0 < 400;
-  // 左右滑:超過 50px,或很快地甩一下超過 30px
-  const flip = dir==='h' && (Math.abs(fx) > 50 || (quick && Math.abs(fx) > 30));   // 上下捲動中不翻頁,頁面才穩
-  if (flip) go(fx < 0 ? cur+1 : cur-1); else if (dir==='h') go(cur);
-  dir = null; dx = 0;
-}
-track.addEventListener('touchend', endSwipe);
-track.addEventListener('touchcancel', ()=>{ if (dir==='h') go(cur); dir=null; dx=0; });
 
 /* 電腦:觸控板兩指左右滑 */
 let wheelX = 0, wheelLock = 0;
