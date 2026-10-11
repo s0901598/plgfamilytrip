@@ -296,9 +296,7 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 /* 隱藏驚喜:團康頁連點「★ 特別活動」5 下,公布隊長名單 */
 .star-badge[data-secret]{touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;transition:background .2s,color .2s}
 .star-badge[data-secret].tap1{background:var(--lab4);color:#fff;animation:tapPop .25s ease-out}
-.star-badge[data-secret].tap2{background:var(--lab1);color:#fff;animation:tapPop2 .25s ease-out}
 @keyframes tapPop{50%{transform:scale(1.12)}}
-@keyframes tapPop2{50%{transform:scale(1.12)}}
 .cap{position:absolute;inset:0;z-index:18;background:rgba(40,30,22,.72);display:flex;align-items:center;justify-content:center;padding:20px;--c:var(--d2);--cs:var(--d2s)}
 .cap[hidden]{display:none}
 .cap-box{position:relative;width:100%;max-width:360px;background:var(--paper);border:5px double var(--c);border-radius:24px;padding:28px 20px 20px;text-align:center;box-shadow:0 12px 32px rgba(40,30,22,.35);animation:capIn .3s ease-out}
@@ -771,11 +769,11 @@ document.addEventListener('click', e=>{
   const z = e.target.closest('[data-zoom]'); if (!z || z.querySelector('.illus.missing')) return;
   lbImg.src = z.dataset.zoom; lbImg.alt = z.getAttribute('aria-label') || ''; lb.hidden = false;
 });
-/* 隱藏驚喜:團康頁的「★ 特別活動」點一下換顏色(金→橘→粉紅),第 3 下打開,一張一張公布隊長 */
+/* 隱藏驚喜:團康頁的「★ 特別活動」點一下變橘色,第 2 下打開,一張一張公布隊長 */
 const cap = document.getElementById('cap');
 let secretTaps = 0, secretTimer = 0;
 function paintSecret(){   // 團康頁和 DAY 2 點開的團康畫面都有這個標籤,一起換色
-  document.querySelectorAll('[data-secret]').forEach(b=>{ b.classList.toggle('tap1', secretTaps===1); b.classList.toggle('tap2', secretTaps===2); });
+  document.querySelectorAll('[data-secret]').forEach(b=>{ b.classList.toggle('tap1', secretTaps===1); });
 }
 function capAsk(){
   CAPTAINS.forEach(c=>{ new Image().src = 'images/'+c[2]; });   // 問「準備好了嗎」時先在背景載入頭像,按打開就直接出現
@@ -805,7 +803,7 @@ document.addEventListener('click', e=>{
   if (!e.target.closest('[data-secret]')) return;
   clearTimeout(secretTimer);
   secretTaps++;
-  if (secretTaps >= 3){ secretTaps = 0; paintSecret(); capAsk(); cap.hidden = false; return; }
+  if (secretTaps >= 2){ secretTaps = 0; paintSecret(); capAsk(); cap.hidden = false; return; }
   paintSecret();
   secretTimer = setTimeout(()=>{ secretTaps = 0; paintSecret(); }, 3000);   // 3 秒沒再點就變回金色
 });
