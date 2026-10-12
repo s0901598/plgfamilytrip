@@ -704,7 +704,6 @@ function renderNav(k){
 function render(instant){
   pages.forEach((p,k)=>{ p.inert = k!==cur; });
   renderNav(cur);
-  try{ history.replaceState(null,'','#p'+(cur+1)); }catch(e){}
   if (instant) resetOthers();
 }
 /* 翻頁停下來後,其他頁先回到最上面,下次滑到交界處不會看到頁面跳動 */
@@ -826,9 +825,6 @@ document.addEventListener('click', e=>{
   const b = e.target.closest('[data-go]');
   if (b) go(pg(b.dataset.go)-1);
 });
-window.addEventListener('hashchange', ()=>{
-  const h = /^#p(\d+)$/.exec(location.hash); if (h && +h[1]-1 !== cur) go(+h[1]-1);
-});
 book.addEventListener('scroll', ()=>{ book.scrollLeft = 0; });
 
 
@@ -908,9 +904,11 @@ document.addEventListener('click', e=>{
 });
 window.addEventListener('resize', renderBingo);
 
-const m = /^#p(\d+)$/.exec(location.hash);
+/* 每次打開或重新整理都從封面開始;網址上舊的頁碼(#p5)一併清掉 */
+try{ if (location.hash) history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 cur = -1;
-go(m ? +m[1]-1 : 0, true);   // 打開時直接停在該頁,不播放滑動動畫
+go(0, true);
 </script>
 </body>
 </html>
