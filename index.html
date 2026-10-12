@@ -296,8 +296,7 @@ img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 /* 隱藏驚喜:團康頁連點「★ 特別活動」5 下,公布隊長名單 */
 .star-badge[data-secret]{touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;transition:background .2s,color .2s}
 .star-badge[data-secret].tap1{background:var(--lab4);color:#fff;animation:tapPop .25s ease-out}
-/* 晚會頁的隱藏點歌:第 1 下橘色、第 2 下粉紅色並打開點歌系統 */
-.star-badge[data-secret].tap2{background:var(--lab1);color:#fff;animation:tapPop .25s ease-out}
+
 @keyframes tapPop{50%{transform:scale(1.12)}}
 .cap{position:absolute;inset:0;z-index:18;background:rgba(40,30,22,.72);display:flex;align-items:center;justify-content:center;padding:20px;--c:var(--d2);--cs:var(--d2s)}
 .cap[hidden]{display:none}
@@ -798,28 +797,29 @@ function capCard(i){
     </div>
   </div>`;
 }
-function closeCap(){ cap.hidden = true; cap.innerHTML = ''; }
-/* 隱藏點歌:晚會頁的「★ 特別活動」點一下變橘色,第 2 下變粉紅色並打開點歌系統 */
+function closeCap(){ cap.hidden = true; cap.innerHTML = ''; if (typeof paintJuke==='function') paintJuke(false); }
+/* 隱藏點歌:晚會頁的「★ 特別活動」點一下,跳出彈窗問要不要前往點歌系統 */
 const JUKEBOX_URL = 'https://s0901598.github.io/ktv-jukebox/';
-let jukeTaps = 0, jukeTimer = 0;
-function paintJuke(){   // 晚會頁和 DAY 2 點開的晚會畫面都有這個標籤,一起換色
-  document.querySelectorAll('[data-secret="jukebox"]').forEach(b=>{
-    b.classList.toggle('tap1', jukeTaps===1);
-    b.classList.toggle('tap2', jukeTaps===2);
-  });
+function paintJuke(on){   // 晚會頁和 DAY 2 點開的晚會畫面都有這個標籤,一起換色
+  document.querySelectorAll('[data-secret="jukebox"]').forEach(b=>{ b.classList.toggle('tap1', on); });
 }
 document.addEventListener('click', e=>{
   if (!e.target.closest('[data-secret="jukebox"]')) return;
-  clearTimeout(jukeTimer);
-  jukeTaps++;
-  paintJuke();
-  if (jukeTaps >= 2){
+  paintJuke(true);
+  cap.innerHTML = `<div class="cap-box cap-ask">
+    <div class="big">🎤</div>
+    <h2>要前往點歌系統嗎？</h2>
+    <div class="cap-btns"><button type="button" class="cap-no" data-juke="cancel">取消</button><button type="button" class="cap-yes" data-juke="ok">確認</button></div>
+  </div>`;
+  cap.hidden = false;
+});
+cap.addEventListener('click', e=>{
+  const b = e.target.closest('[data-juke]'); if (!b) return;
+  if (b.dataset.juke==='ok'){
     const w = window.open(JUKEBOX_URL, '_blank');
     if (!w) location.href = JUKEBOX_URL;   // 瀏覽器擋新分頁時,直接在同一頁打開
-    jukeTimer = setTimeout(()=>{ jukeTaps = 0; paintJuke(); }, 800);
-    return;
   }
-  jukeTimer = setTimeout(()=>{ jukeTaps = 0; paintJuke(); }, 3000);   // 3 秒沒再點就變回金色
+  closeCap();
 });
 document.addEventListener('click', e=>{
   if (!e.target.closest('[data-secret=""]')) return;
