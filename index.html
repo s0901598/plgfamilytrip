@@ -541,7 +541,7 @@ function dayPages(d){
       ${illus(D.img[0], D.img[1])}
       <div class="big">DAY ${d}</div>
       <div class="date">${D.date}</div>
-      <p class="theme">${D.theme}</p>
+      <p class="theme">${D.theme.replace('，','，<br>')}</p>
     </div>
     <ol class="tl">${D.items.map(([t,title,note,link,extra])=>`
       <li class="${link?'star':''}">
